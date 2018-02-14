@@ -1,0 +1,11 @@
+username : salt : iterations : hashed password
+jgarcia: 1vGZ8kutWReG8oTOpX60dyRUHaI6hzjiS1fuD7ia+3w= : 1 : 5HXchzDX2wqqGt9c/l1o3F1OH0Pd8aLPHQnN0ds4AK0=
+tsato: I9amxwcBZGedYerhFKLzJptk5HpH89nvLz99pTR8kWA= : 1 : BDbs2+2DOBs6I2DafuJYxsJZYMmi3MkuxtIL/hj3QoQ=
+rwong: FW0b0vJ72twGLxcWyWznnrC7ForkkUiCcP78yY2nXxM= : 1 : UQuR/p3YWmImeUP8qAukV43YolzLAiPXw2ohnLgsp1w=
+kjackson: uP0uwaYpAnlJuNP+IDamN+iXzBklCxjngui/TK9Pf/w= : 1 : 7UBQA2IgzEdofrFMFIZ/cDGu4p8fqaHDp/W59FHacsI=
+cbrown: 36fMDaD6guPJSaPFHv/jER6tCIqt4uPl9yd8FB/hm9I= : 1 : KYk7Ck088hMjYFtQvE9U0VhMW7sCQIX2T6Cx0KN7R5M=
+kwilson: SOxmsiQx80oIZ9hHmAOTj68kT6dkO9RNZMIuVfkz4QE= : 1 : jRFkzI/HxAYKMxHoE3H8sKcR2cpTu/v24M9PwShHT4U=
+adavis: JJ+smo6LgeDpt8qQWnmSzdpIiziQEfVEI7LLMt+e+nQ= : 1 : 3TxZ6bsB/Rn87m7YiLLguT8culYptd9KYm/dDH3OR8o=
+mzhang: +cjc4tFN+Qa+EgwOCr/aE9qHrK/P+Z4/wtjKyp2BSNc= : 1 : 7W+WSmHXLMUMHfZrOjx7zIzDTMTinA+5UXUg4IKw/io=
+lzhao: YtVdwHi5VGs7LU8hBDI2GpaaAjutk0BEfv1Lgaq+ciI= : 1 : dn0ZCRsfufR2aiwVkgwzqDms3RtAmYelnzmfSWRDjN4=
+pmartinez: 5YLVoA7axW5vAR4RJH3HGqopohVEhr4vh0ZHId4U9IQ= : 1 : I0UFLxbDoYfK+f4yglCaKcLhEqD2LsPbceDDl1J3ne4=
