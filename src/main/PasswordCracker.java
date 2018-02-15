@@ -14,6 +14,11 @@ import beans.*;
 
 public class PasswordCracker {
 	
+	//Lists of Resources for Hybrid attack
+	private static List<String> numbersAtEnd = new ArrayList<String>(); //Numbers At End
+	private static List<String> dob = new ArrayList<String>(); //Date of Birth
+	private static List<String> specialSymbols = new ArrayList<String>(); //Date of Birth
+	
 	//Data Structure for Hybrid attacks
 	private static List<PasswordFileLine> passwordFileLineList = new ArrayList<PasswordFileLine>();
 	
@@ -27,7 +32,15 @@ public class PasswordCracker {
 	
 	public static void main(String[] args) {
 		try {				
-							
+				//Populating Resource Lists from Resource Files
+				populateResourceList(numbersAtEnd, "resources/hybridattack/numbersAtEnd.txt");	
+				populateResourceList(dob, "resources/hybridattack/dob.txt");
+				populateResourceList(specialSymbols, "resources/hybridattack/specialSymbols.txt");
+				
+//				for(String s: specialSymbols) {
+//					System.out.println(s);
+//				}
+			
 				//Input Password File				
 				BufferedReader passwordBuffer = fileToBuffer("resources/pswd.txt");		
 				//Parse the buffer to extract usernames and passwords
@@ -57,20 +70,38 @@ public class PasswordCracker {
 				//Step 1: Check with usernames and its combinations as Passwords
 				for(PasswordFileLine pFileLine: passwordFileLineList) {					
 					//Step 1a: Check with username directly as password
-					checkHack(pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());					
-					//Step 1b: Check with username reversed as password
-					String reversedUsername = new StringBuilder(pFileLine.getUsername()).reverse().toString();		
+					checkHack(pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+					
+					//Step 1b: Check with username with vowels removed as password
+					String usernameWOVowels = pFileLine.getUsername().replaceAll("[AEIOUaeiou]", "");
+					checkHack(usernameWOVowels, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+					
+					//Step 1c: Check with username reversed as password
+					String reversedUsername = new StringBuilder(pFileLine.getUsername()).reverse().toString();
+					checkHack(reversedUsername, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+					
+					//Step 1d: Check with reversed username with vowels removed as password
+					String reversedUsernameWOVowels = reversedUsername.replaceAll("[AEIOUaeiou]", "");
+					checkHack(reversedUsernameWOVowels, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+										
+					
 				}
 				
 				
 				
 				//Input Dictionary1				
-				BufferedReader dictionaryBuffer1 = fileToBuffer("resources/john.txt");				
+				BufferedReader dictionaryBuffer1 = fileToBuffer("resources/dictionaryattack/john.txt");				
 				//Step 2: Dictionary Attack
 				String dictionaryFileLine = null;
 				while ((dictionaryFileLine = dictionaryBuffer1.readLine()) != null) {										
 					for(String salt: saltList) {//Checking all available salts
+						//Step 2a: Checking dictionary directly
 						checkHack(dictionaryFileLine.trim(), saltToUsername.get(salt), salt, saltToPassword.get(salt));
+						
+						//Step 2b: Dictionary with numbers at end
+						for(String number: numbersAtEnd) {
+							checkHack(dictionaryFileLine.trim()+number, saltToUsername.get(salt), salt, saltToPassword.get(salt));
+						}
 					}										
 				}			
 				//Closing Buffer - Done reading dictionary file
@@ -83,9 +114,6 @@ public class PasswordCracker {
 				    System.out.println(entry.getKey()+"::"+entry.getValue());
 				}					
 				
-				
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -101,13 +129,6 @@ public class PasswordCracker {
 	}
 	
 	
-	private static BufferedReader fileToBuffer(String filePath) throws FileNotFoundException {
-		File file = new File(filePath);
-		FileInputStream fileInputStream = new FileInputStream(file);
-		BufferedReader buffer = new BufferedReader(new InputStreamReader(fileInputStream));
-		return buffer;	
-	}
-	
 	private static byte[] hashPassword( final char[] password, final byte[] salt, final int iterations, final int keyLength ) {
 		 
 	       try {
@@ -120,6 +141,24 @@ public class PasswordCracker {
 	       } catch( NoSuchAlgorithmException | InvalidKeySpecException e ) {
 	           throw new RuntimeException( e );
 	       }
+	}
+	
+	private static BufferedReader fileToBuffer(String filePath) throws IOException {
+		File file = new File(filePath);
+		FileInputStream fileInputStream = new FileInputStream(file);
+		BufferedReader buffer = new BufferedReader(new InputStreamReader(fileInputStream));
+		return buffer;	
+	}
+	
+	private static void populateResourceList(List<String> resourceList, String filePath) throws IOException {
+		BufferedReader resourceListBuffer = fileToBuffer(filePath);		
+		//Parse the buffer to extract String
+		String fileLine = null;
+		while ((fileLine = resourceListBuffer.readLine()) != null) {
+			resourceList.add(fileLine.trim());
+		}			
+		//Closing Buffer - Done reading file
+		resourceListBuffer.close();
 	}
 	
 	
