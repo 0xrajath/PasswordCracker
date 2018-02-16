@@ -36,7 +36,7 @@ public class PasswordCracker {
 	private static Map<String, String> usernameToPlaintextPassword = new HashMap<String, String>();
 	
 	public static void main(String[] args) {
-		try {				
+		try {											
 				//Populating Resource Lists from Resource Files
 				populateResourceList(numbersAtEnd, "resources/hybridattack/numbersAtEnd.txt");	
 				populateResourceList(dob, "resources/hybridattack/dob.txt");
@@ -74,117 +74,28 @@ public class PasswordCracker {
 				
 				//Step 1: Check with usernames and its combinations as Passwords
 				for(PasswordFileLine pFileLine: passwordFileLineList) {					
-					//Step 11a: Check with username directly as password
-					checkHack(pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+					System.out.println("Starting Step 1a");
+					//Step 1a: Checking with username as plaintextpassword directly
+					checkHackCombinations(pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+					System.out.println("Finished Step 1a");
 					
-					//Step 11b: Check with all combinations with username&dob and username&dob&symbol as password
-					for(String dateOfBirth: dob) {
-						checkHack(pFileLine.getUsername()+dateOfBirth, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-						checkHack(dateOfBirth+pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-						for(String symbol: specialSymbols) {
-							checkHack(pFileLine.getUsername()+dateOfBirth+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-							checkHack(dateOfBirth+symbol+pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-							checkHack(pFileLine.getUsername()+symbol+dateOfBirth, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-							checkHack(symbol+dateOfBirth+pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-							checkHack(symbol+pFileLine.getUsername()+dateOfBirth, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-							checkHack(dateOfBirth+pFileLine.getUsername()+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-						}
-					}
-					
-					//Step 11c: Check with all combinations with username&number and username&number&symbol as password
-					for(String number: numbersAtEnd) {
-						checkHack(pFileLine.getUsername()+number, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-						checkHack(number+pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-						for(String symbol: specialSymbols) {
-							checkHack(pFileLine.getUsername()+number+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-							checkHack(number+symbol+pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-							checkHack(pFileLine.getUsername()+symbol+number, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-							checkHack(symbol+number+pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-							checkHack(symbol+pFileLine.getUsername()+number, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-							checkHack(number+pFileLine.getUsername()+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-						}
-					}
-					
-					//Step 11d: Check with all combinations with username&symbol as password
-					for(String symbol: specialSymbols) {
-						checkHack(pFileLine.getUsername()+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-						checkHack(symbol+pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-					}				
-					
-					//Step 11e: Check with username with vowels removed as password
-					String usernameWOVowels = pFileLine.getUsername().replaceAll("[AEIOUaeiou]", "");
-					checkHack(usernameWOVowels, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-					
-					//Step 11f: Check with vowels removed in username+dob and username+dob+symbol and username+symbol+dob as password
-					for(String dateOfBirth: dob) {
-						checkHack(usernameWOVowels+dateOfBirth, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-						for(String symbol: specialSymbols) {
-							checkHack(usernameWOVowels+dateOfBirth+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-							checkHack(usernameWOVowels+symbol+dateOfBirth, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-						}
-					}
-					
-					//Step 11g: Check with vowels removed in username+number and username+symbol+number and username+number+symbol as password
-					for(String number: numbersAtEnd) {
-						checkHack(usernameWOVowels+number, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-						for(String symbol: specialSymbols) {
-							checkHack(usernameWOVowels+number+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-							checkHack(usernameWOVowels+symbol+number, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-						}
-					}
-					
-					//Step 11h: Check with vowels removed in username+symbol as password
-					for(String symbol: specialSymbols) {
-						checkHack(usernameWOVowels+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-					}		
-					
-					
-					
-					//Step 12a: Check with username reversed as password
-					String reversedUsername = new StringBuilder(pFileLine.getUsername()).reverse().toString();
-					checkHack(reversedUsername, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-					
-					//Step 12b: Check with reversed username with vowels removed as password
-					String reversedUsernameWOVowels = reversedUsername.replaceAll("[AEIOUaeiou]", "");
-					checkHack(reversedUsernameWOVowels, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-					
-					
-					
-					//Step 13a: Check with just surname in username as password
-					checkHack(pFileLine.getUsername().substring(1), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-					
-					//Step 13b: Check with surname+dob as password
-					for(String dateOfBirth: dob) {
-						checkHack(pFileLine.getUsername().substring(1)+dateOfBirth, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-					}
-					
-					//Step 13c: Check with just surname+number as password
-					for(String number: numbersAtEnd) {
-						checkHack(pFileLine.getUsername().substring(1)+number, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-					}
-					
-					//Step 13d: Check with just surname+symbol as password
-					for(String symbol: specialSymbols) {
-						checkHack(pFileLine.getUsername().substring(1)+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-					}
-					
-					//Step 13e: Check with surname with vowels removed as password
-					String surnameWOVowels = pFileLine.getUsername().substring(1).replaceAll("[AEIOUaeiou]", "");
-					checkHack(surnameWOVowels, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-					
-					//Step 14a: Check with just surname in username which is reversed as password
-					String reversedSurname = new StringBuilder(pFileLine.getUsername().substring(1)).reverse().toString();
-					checkHack(reversedSurname, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-															
+					System.out.println("Starting Step 1b");
+					//Step 1b: Checking with just surname in username as plaintextpassword
+					checkHackCombinations(pFileLine.getUsername().substring(1), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+					System.out.println("Finished Step 1b");
 				}
-				
+							
 				
 				
 				//Input Dictionary1				
 				BufferedReader dictionaryBuffer1 = fileToBuffer("resources/dictionaryattack/john.txt");				
 				//Step 2: Dictionary Attack
+				System.out.println("Starting Step 2");
 				String dictionaryFileLine = null;
-				while ((dictionaryFileLine = dictionaryBuffer1.readLine()) != null) {										
+//				int count = 1;
+				while ((dictionaryFileLine = dictionaryBuffer1.readLine()) != null) {	
+//					System.out.println(count);
+//					count++;
 					for(String salt: saltList) {//Checking all available salts
 						//Step 2a: Checking dictionary directly
 						checkHack(dictionaryFileLine.trim(), saltToUsername.get(salt), salt, saltToPassword.get(salt));
@@ -193,8 +104,32 @@ public class PasswordCracker {
 						for(String number: numbersAtEnd) {
 							checkHack(dictionaryFileLine.trim()+number, saltToUsername.get(salt), salt, saltToPassword.get(salt));
 						}
+						
+						//Step 2c: Dictionary with dob at end
+						for(String dateOfBirth: dob) {
+							checkHack(dictionaryFileLine.trim()+dateOfBirth, saltToUsername.get(salt), salt, saltToPassword.get(salt));
+						}
+						
+						//Step 2d: Dictionary with symbols at end
+						for(String symbol: specialSymbols) {
+							checkHack(dictionaryFileLine.trim()+symbol, saltToUsername.get(salt), salt, saltToPassword.get(salt));
+						}
+						
+						//Step 2e: Dictionary reversed
+						String reversedDictionaryWord = new StringBuilder(dictionaryFileLine.trim().toLowerCase()).reverse().toString();
+						checkHack(reversedDictionaryWord, saltToUsername.get(salt), salt, saltToPassword.get(salt));
+						
+						//Step 2f: First letter of Dictionary opposite case
+						if(!dictionaryFileLine.trim().isEmpty()) {
+							checkHack(makeFirstLetterOppositeCase(dictionaryFileLine.trim()), saltToUsername.get(salt), salt, saltToPassword.get(salt));
+						}
+						
+						
+//						//Checking Dictionary words and its combinations
+//						checkHackCombinations(dictionaryFileLine.trim(), saltToUsername.get(salt), salt, saltToPassword.get(salt));
 					}										
-				}			
+				}
+				System.out.println("Finished Step 2");
 				//Closing Buffer - Done reading dictionary file
 				dictionaryBuffer1.close();
 				
@@ -212,10 +147,82 @@ public class PasswordCracker {
 	}
 	
 	
+	//Method to check most occurring combinations of PlaintextPassword
 	private static void checkHackCombinations(String plaintextPassword, String username, String encodedSalt , String encodedHashedPassword) {
+		//Checking plaintextpassword directly
+		checkHackSymbolNumberDOBCombinations(plaintextPassword, username, encodedSalt, encodedHashedPassword);
 		
+		//Checking plaintextpassword with first letter made to opposite case
+		checkHackSymbolNumberDOBCombinations(makeFirstLetterOppositeCase(plaintextPassword), username, encodedSalt, encodedHashedPassword);
+		
+		//Checking plaintextpassword with all vowels removed
+		String plaintextPasswordWOVowels = plaintextPassword.replaceAll("[AEIOUaeiou]", "");
+		checkHackSymbolNumberDOBCombinations(plaintextPasswordWOVowels, username, encodedSalt, encodedHashedPassword);
+		
+		//Making plaintextpassword all lowercase and reversing it and then checking
+		String reversedPlaintextPassword = new StringBuilder(plaintextPassword.toLowerCase()).reverse().toString();
+		checkHackSymbolNumberDOBCombinations(reversedPlaintextPassword, username, encodedSalt, encodedHashedPassword);
+		
+		//Checking reversed Plaintextpassword with first letter made to opposite case
+		checkHackSymbolNumberDOBCombinations(makeFirstLetterOppositeCase(reversedPlaintextPassword), username, encodedSalt, encodedHashedPassword);
+		
+		//Checking reversed Plaintextpassword with all vowels removed
+		String reversedPlaintextPasswordWOVowels = reversedPlaintextPassword.replaceAll("[AEIOUaeiou]", "");
+		checkHackSymbolNumberDOBCombinations(reversedPlaintextPasswordWOVowels, username, encodedSalt, encodedHashedPassword);		
 	}
 	
+	
+	//Method to make first letter of String opposite case
+	private static String makeFirstLetterOppositeCase (String s) {
+		if(Character.isLowerCase(s.charAt(0)))
+			return s.substring(0, 1).toUpperCase() + s.substring(1);
+		else
+			return s.substring(0, 1).toLowerCase() + s.substring(1);
+	}
+	
+	
+	//Method to check Symbol and Dob combinations with given plaintextPassword
+	private static void checkHackSymbolNumberDOBCombinations(String plaintextPassword, String username, String encodedSalt , String encodedHashedPassword) {
+		//Step 1: Check with plaintextpassword directly
+		checkHack(plaintextPassword, username, encodedSalt, encodedHashedPassword);
+		
+		//Step 2: Check with all combinations of plaintextpassword&dob and plaintextpassword&dob&symbol
+		for(String dateOfBirth: dob) {
+			checkHack(plaintextPassword+dateOfBirth, username, encodedSalt, encodedHashedPassword);
+			checkHack(dateOfBirth+plaintextPassword, username, encodedSalt, encodedHashedPassword);
+			for(String symbol: specialSymbols) {
+				checkHack(plaintextPassword+dateOfBirth+symbol, username, encodedSalt, encodedHashedPassword);
+				checkHack(dateOfBirth+symbol+plaintextPassword, username, encodedSalt, encodedHashedPassword);
+				checkHack(plaintextPassword+symbol+dateOfBirth, username, encodedSalt, encodedHashedPassword);
+				checkHack(symbol+dateOfBirth+plaintextPassword, username, encodedSalt, encodedHashedPassword);
+				checkHack(symbol+plaintextPassword+dateOfBirth, username, encodedSalt, encodedHashedPassword);
+				checkHack(dateOfBirth+plaintextPassword+symbol, username, encodedSalt, encodedHashedPassword);
+			}
+		}
+		
+		//Step 3: Check with all combinations of plaintextpassword&number and plaintextpassword&number&symbol 
+		for(String number: numbersAtEnd) {
+			checkHack(plaintextPassword+number, username, encodedSalt, encodedHashedPassword);
+			checkHack(number+plaintextPassword, username, encodedSalt, encodedHashedPassword);
+			for(String symbol: specialSymbols) {
+				checkHack(plaintextPassword+number+symbol, username, encodedSalt, encodedHashedPassword);
+				checkHack(number+symbol+plaintextPassword, username, encodedSalt, encodedHashedPassword);
+				checkHack(plaintextPassword+symbol+number, username, encodedSalt, encodedHashedPassword);
+				checkHack(symbol+number+plaintextPassword, username, encodedSalt, encodedHashedPassword);
+				checkHack(symbol+plaintextPassword+number, username, encodedSalt, encodedHashedPassword);
+				checkHack(number+plaintextPassword+symbol, username, encodedSalt, encodedHashedPassword);
+			}
+		}
+		
+		//Step 4: Check with all combinations of plaintextpassword&symbol 
+		for(String symbol: specialSymbols) {
+			checkHack(plaintextPassword+symbol, username, encodedSalt, encodedHashedPassword);
+			checkHack(symbol+plaintextPassword, username,encodedSalt, encodedHashedPassword);
+		}				
+	}
+	
+	
+	//Method to compare hashed plaintextpassword against available hashed password
 	private static void checkHack(String plaintextPassword, String username, String encodedSalt , String encodedHashedPassword) {
 		char [] plaintextPword = plaintextPassword.toCharArray();
 		
@@ -225,6 +232,7 @@ public class PasswordCracker {
 	}
 	
 	
+	//Hashing Algorithm used
 	private static byte[] hashPassword( final char[] password, final byte[] salt, final int iterations, final int keyLength ) {
 		 
 	       try {
@@ -239,6 +247,8 @@ public class PasswordCracker {
 	       }
 	}
 	
+	
+	//File to BufferedReader Method
 	private static BufferedReader fileToBuffer(String filePath) throws IOException {
 		File file = new File(filePath);
 		FileInputStream fileInputStream = new FileInputStream(file);
@@ -246,6 +256,8 @@ public class PasswordCracker {
 		return buffer;	
 	}
 	
+	
+	//Method to populate Resource Lists
 	private static void populateResourceList(List<String> resourceList, String filePath) throws IOException {
 		BufferedReader resourceListBuffer = fileToBuffer(filePath);		
 		//Parse the buffer to extract String
