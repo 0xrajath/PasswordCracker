@@ -17,7 +17,7 @@ import java.security.spec.InvalidKeySpecException;
 import beans.*;
 
 
-public class PasswordCracker {
+public class PasswordCrackerExtensive {
 	
 	//Lists of Resources for Hybrid attack
 	private static List<String> numbersAtEnd = new ArrayList<String>(); //Numbers At End
@@ -41,6 +41,7 @@ public class PasswordCracker {
 				populateResourceList(numbersAtEnd, "resources/hybridattack/numbersAtEnd.txt");	
 				populateResourceList(yob, "resources/hybridattack/yob.txt");
 				populateResourceList(specialSymbols, "resources/hybridattack/specialSymbols.txt");
+	
 			
 				//Input Password File				
 				BufferedReader passwordBuffer = fileToBuffer("resources/pswd.txt");		
@@ -80,45 +81,19 @@ public class PasswordCracker {
 				
 				//Input Dictionary1				
 				BufferedReader dictionaryBuffer1 = fileToBuffer("resources/dictionaryattack/john.txt");				
-				//Step 2: Dictionary+Hybrid Attack
+				//Step 2: Dictionary Attack
 				String dictionaryFileLine = null;
 				while ((dictionaryFileLine = dictionaryBuffer1.readLine()) != null) {	
-					for(String salt: saltList) {//Checking all available salts
-						//Step 2a: Checking dictionary directly
-						checkHack(dictionaryFileLine.trim(), saltToUsername.get(salt), salt, saltToPassword.get(salt));
-						
-						//Step 2b: Replace certain characters of Dictionary word with special symbols
-						checkHack(replaceWithSpecialSymbols(dictionaryFileLine.trim()), saltToUsername.get(salt), salt, saltToPassword.get(salt));
-						
-						//Step 2c: Dictionary reversed
-						String reversedDictionaryWord = new StringBuilder(dictionaryFileLine.trim().toLowerCase()).reverse().toString();
-						checkHack(reversedDictionaryWord, saltToUsername.get(salt), salt, saltToPassword.get(salt));
-						
-						//Step 2d: First letter of Dictionary word made opposite case
-						if(!dictionaryFileLine.trim().isEmpty()) {
-							checkHack(makeFirstLetterOppositeCase(dictionaryFileLine.trim()), saltToUsername.get(salt), salt, saltToPassword.get(salt));
-						}
-					
-						//Step 2e: Dictionary with numbers at end
-						for(String number: numbersAtEnd) {
-							checkHack(dictionaryFileLine.trim()+number, saltToUsername.get(salt), salt, saltToPassword.get(salt));
-						}
-						
-						//Step 2f: Dictionary with yob at end
-						for(String yearOfBirth: yob) {
-							checkHack(dictionaryFileLine.trim()+yearOfBirth, saltToUsername.get(salt), salt, saltToPassword.get(salt));
-						}
-						
-						//Step 2g: Dictionary with symbols at end
-						for(String symbol: specialSymbols) {
-							checkHack(dictionaryFileLine.trim()+symbol, saltToUsername.get(salt), salt, saltToPassword.get(salt));
-						}																	
+					for(String salt: saltList) {//Checking all available salts								
+						//Checking Dictionary words and its combinations
+						checkHackCombinations(dictionaryFileLine.trim(), saltToUsername.get(salt), salt, saltToPassword.get(salt));
 					}										
 				}
 				//Closing Buffer - Done reading dictionary file
-				dictionaryBuffer1.close();
+				dictionaryBuffer1.close();				
 				
-							
+				
+				
 				//Printing out Username::Password matched pairs
 				for (Map.Entry<String, String> entry : usernameToPlaintextPassword.entrySet()) {
 				    System.out.println(entry.getKey()+"::"+entry.getValue());
@@ -146,6 +121,10 @@ public class PasswordCracker {
 		//Checking plaintextpassword with certain characters replaced by symbols
 		checkHackSymbolNumberDOBCombinations(replaceWithSpecialSymbols(plaintextPassword), username, encodedSalt, encodedHashedPassword);
 		
+		//Doubling up plaintextpassword and checking
+		checkHackSymbolNumberDOBCombinations(plaintextPassword+plaintextPassword, username, encodedSalt, encodedHashedPassword);
+		
+		
 		//Making plaintextpassword all lowercase and reversing it and then checking
 		String reversedPlaintextPassword = new StringBuilder(plaintextPassword.toLowerCase()).reverse().toString();
 		checkHackSymbolNumberDOBCombinations(reversedPlaintextPassword, username, encodedSalt, encodedHashedPassword);
@@ -159,6 +138,11 @@ public class PasswordCracker {
 		
 		//Checking reversed plaintextpassword with certain characters replaced by symbols
 		checkHackSymbolNumberDOBCombinations(replaceWithSpecialSymbols(reversedPlaintextPassword), username, encodedSalt, encodedHashedPassword);
+		
+		//Doubling up reversed plaintextpassword and combinations and checking
+		checkHackSymbolNumberDOBCombinations(reversedPlaintextPassword+reversedPlaintextPassword, username, encodedSalt, encodedHashedPassword);
+		checkHackSymbolNumberDOBCombinations(plaintextPassword+reversedPlaintextPassword, username, encodedSalt, encodedHashedPassword);
+		checkHackSymbolNumberDOBCombinations(reversedPlaintextPassword+plaintextPassword, username, encodedSalt, encodedHashedPassword);		
 	}
 	
 	
@@ -182,27 +166,57 @@ public class PasswordCracker {
 		//Step 1: Check with plaintextpassword directly
 		checkHack(plaintextPassword, username, encodedSalt, encodedHashedPassword);
 		
-		//Step 2: Check with combinations of plaintextpassword&yob and plaintextpassword&yob&symbol
+		//Step 2: Check with all combinations of plaintextpassword&dob and plaintextpassword&dob&symbol
 		for(String yearOfBirth: yob) {
 			checkHack(plaintextPassword+yearOfBirth, username, encodedSalt, encodedHashedPassword);
+			checkHack(yearOfBirth+plaintextPassword, username, encodedSalt, encodedHashedPassword);
 			for(String symbol: specialSymbols) {
 				checkHack(plaintextPassword+yearOfBirth+symbol, username, encodedSalt, encodedHashedPassword);
+				checkHack(yearOfBirth+symbol+plaintextPassword, username, encodedSalt, encodedHashedPassword);
 				checkHack(plaintextPassword+symbol+yearOfBirth, username, encodedSalt, encodedHashedPassword);
+				checkHack(symbol+yearOfBirth+plaintextPassword, username, encodedSalt, encodedHashedPassword);
+				checkHack(symbol+plaintextPassword+yearOfBirth, username, encodedSalt, encodedHashedPassword);
+				checkHack(yearOfBirth+plaintextPassword+symbol, username, encodedSalt, encodedHashedPassword);
+			}
+			
+			
+			//Checking DDMM combinations as well
+			for(int i=1; i<=31; ++i) {
+				for(int j=1; j<=12; ++j) {
+					checkHack(plaintextPassword+String.format("%02d%02d",i,j)+yearOfBirth, username, encodedSalt, encodedHashedPassword);
+					checkHack(plaintextPassword+String.format("%02d/%02d/",i,j)+yearOfBirth, username, encodedSalt, encodedHashedPassword);
+					checkHack(plaintextPassword+String.format("%02d-%02d-",i,j)+yearOfBirth, username, encodedSalt, encodedHashedPassword);
+				}
+			}
+			
+			//Checking MMDD combinations as well
+			for(int i=1; i<=12; ++i) {
+				for(int j=1; j<=31; ++j) {
+					checkHack(plaintextPassword+String.format("%02d%02d",i,j)+yearOfBirth, username, encodedSalt, encodedHashedPassword);
+					checkHack(plaintextPassword+String.format("%02d/%02d/",i,j)+yearOfBirth, username, encodedSalt, encodedHashedPassword);
+					checkHack(plaintextPassword+String.format("%02d-%02d-",i,j)+yearOfBirth, username, encodedSalt, encodedHashedPassword);
+				}
 			}
 		}
 		
-		//Step 3: Check with combinations of plaintextpassword&number and plaintextpassword&number&symbol 
+		//Step 3: Check with all combinations of plaintextpassword&number and plaintextpassword&number&symbol 
 		for(String number: numbersAtEnd) {
 			checkHack(plaintextPassword+number, username, encodedSalt, encodedHashedPassword);
+			checkHack(number+plaintextPassword, username, encodedSalt, encodedHashedPassword);
 			for(String symbol: specialSymbols) {
 				checkHack(plaintextPassword+number+symbol, username, encodedSalt, encodedHashedPassword);
+				checkHack(number+symbol+plaintextPassword, username, encodedSalt, encodedHashedPassword);
 				checkHack(plaintextPassword+symbol+number, username, encodedSalt, encodedHashedPassword);
+				checkHack(symbol+number+plaintextPassword, username, encodedSalt, encodedHashedPassword);
+				checkHack(symbol+plaintextPassword+number, username, encodedSalt, encodedHashedPassword);
+				checkHack(number+plaintextPassword+symbol, username, encodedSalt, encodedHashedPassword);
 			}
 		}
 		
-		//Step 4: Check with combinations of plaintextpassword&symbol 
+		//Step 4: Check with all combinations of plaintextpassword&symbol 
 		for(String symbol: specialSymbols) {
 			checkHack(plaintextPassword+symbol, username, encodedSalt, encodedHashedPassword);
+			checkHack(symbol+plaintextPassword, username,encodedSalt, encodedHashedPassword);
 		}				
 	}
 	
@@ -257,4 +271,3 @@ public class PasswordCracker {
 	
 
 }
-

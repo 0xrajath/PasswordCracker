@@ -1,6 +1,6 @@
 /*
 * Name: Rajath George Alex
-* Description: Password Cracking Program
+* Description: Program to crack encrypted password files using Dictionary+Hybrid attack
 */
 
 package beans;
