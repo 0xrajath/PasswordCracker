@@ -1,3 +1,8 @@
+/*
+* Name: Rajath George Alex
+* Description: Password Cracking Program
+*/
+
 package main;
 
 import javax.crypto.SecretKey;
@@ -69,22 +74,108 @@ public class PasswordCracker {
 				
 				//Step 1: Check with usernames and its combinations as Passwords
 				for(PasswordFileLine pFileLine: passwordFileLineList) {					
-					//Step 1a: Check with username directly as password
+					//Step 11a: Check with username directly as password
 					checkHack(pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
 					
-					//Step 1b: Check with username with vowels removed as password
+					//Step 11b: Check with all combinations with username&dob and username&dob&symbol as password
+					for(String dateOfBirth: dob) {
+						checkHack(pFileLine.getUsername()+dateOfBirth, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+						checkHack(dateOfBirth+pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+						for(String symbol: specialSymbols) {
+							checkHack(pFileLine.getUsername()+dateOfBirth+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+							checkHack(dateOfBirth+symbol+pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+							checkHack(pFileLine.getUsername()+symbol+dateOfBirth, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+							checkHack(symbol+dateOfBirth+pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+							checkHack(symbol+pFileLine.getUsername()+dateOfBirth, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+							checkHack(dateOfBirth+pFileLine.getUsername()+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+						}
+					}
+					
+					//Step 11c: Check with all combinations with username&number and username&number&symbol as password
+					for(String number: numbersAtEnd) {
+						checkHack(pFileLine.getUsername()+number, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+						checkHack(number+pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+						for(String symbol: specialSymbols) {
+							checkHack(pFileLine.getUsername()+number+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+							checkHack(number+symbol+pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+							checkHack(pFileLine.getUsername()+symbol+number, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+							checkHack(symbol+number+pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+							checkHack(symbol+pFileLine.getUsername()+number, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+							checkHack(number+pFileLine.getUsername()+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+						}
+					}
+					
+					//Step 11d: Check with all combinations with username&symbol as password
+					for(String symbol: specialSymbols) {
+						checkHack(pFileLine.getUsername()+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+						checkHack(symbol+pFileLine.getUsername(), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+					}				
+					
+					//Step 11e: Check with username with vowels removed as password
 					String usernameWOVowels = pFileLine.getUsername().replaceAll("[AEIOUaeiou]", "");
 					checkHack(usernameWOVowels, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
 					
-					//Step 1c: Check with username reversed as password
+					//Step 11f: Check with vowels removed in username+dob and username+dob+symbol and username+symbol+dob as password
+					for(String dateOfBirth: dob) {
+						checkHack(usernameWOVowels+dateOfBirth, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+						for(String symbol: specialSymbols) {
+							checkHack(usernameWOVowels+dateOfBirth+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+							checkHack(usernameWOVowels+symbol+dateOfBirth, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+						}
+					}
+					
+					//Step 11g: Check with vowels removed in username+number and username+symbol+number and username+number+symbol as password
+					for(String number: numbersAtEnd) {
+						checkHack(usernameWOVowels+number, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+						for(String symbol: specialSymbols) {
+							checkHack(usernameWOVowels+number+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+							checkHack(usernameWOVowels+symbol+number, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+						}
+					}
+					
+					//Step 11h: Check with vowels removed in username+symbol as password
+					for(String symbol: specialSymbols) {
+						checkHack(usernameWOVowels+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+					}		
+					
+					
+					
+					//Step 12a: Check with username reversed as password
 					String reversedUsername = new StringBuilder(pFileLine.getUsername()).reverse().toString();
 					checkHack(reversedUsername, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
 					
-					//Step 1d: Check with reversed username with vowels removed as password
+					//Step 12b: Check with reversed username with vowels removed as password
 					String reversedUsernameWOVowels = reversedUsername.replaceAll("[AEIOUaeiou]", "");
 					checkHack(reversedUsernameWOVowels, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
-										
 					
+					
+					
+					//Step 13a: Check with just surname in username as password
+					checkHack(pFileLine.getUsername().substring(1), pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+					
+					//Step 13b: Check with surname+dob as password
+					for(String dateOfBirth: dob) {
+						checkHack(pFileLine.getUsername().substring(1)+dateOfBirth, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+					}
+					
+					//Step 13c: Check with just surname+number as password
+					for(String number: numbersAtEnd) {
+						checkHack(pFileLine.getUsername().substring(1)+number, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+					}
+					
+					//Step 13d: Check with just surname+symbol as password
+					for(String symbol: specialSymbols) {
+						checkHack(pFileLine.getUsername().substring(1)+symbol, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+					}
+					
+					//Step 13e: Check with surname with vowels removed as password
+					String surnameWOVowels = pFileLine.getUsername().substring(1).replaceAll("[AEIOUaeiou]", "");
+					checkHack(surnameWOVowels, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+					
+					//Step 14a: Check with just surname in username which is reversed as password
+					String reversedSurname = new StringBuilder(pFileLine.getUsername().substring(1)).reverse().toString();
+					checkHack(reversedSurname, pFileLine.getUsername(), pFileLine.getSalt(), pFileLine.getHashedPassword());
+															
 				}
 				
 				
@@ -117,6 +208,11 @@ public class PasswordCracker {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+	}
+	
+	
+	private static void checkHackCombinations(String plaintextPassword, String username, String encodedSalt , String encodedHashedPassword) {
 		
 	}
 	

@@ -1,3 +1,8 @@
+/*
+* Name: Rajath George Alex
+* Description: Password Cracking Program
+*/
+
 package beans;
 
 public class PasswordFileLine {
